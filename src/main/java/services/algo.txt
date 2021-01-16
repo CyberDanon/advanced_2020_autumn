@@ -1,0 +1,30 @@
+Long result = STANDART_DELAY_ACCEPTANCE;
+        List<OrderLog> clearLogs = getClearLogs(category_id);
+        Double sumR=0d,sumA=0d,avgR=0d,avgA=0d;
+        for (OrderLog log:clearLogs){
+            sumR+=log.getRegistered();
+            sumA+=log.getAccepted();
+        }
+        avgA=sumA/clearLogs.size();
+        avgR=sumR/clearLogs.size();
+        double sqrDeviationR=0d, sqrDeviationA=0d, fullDeviationAR=0d;
+        for (OrderLog log:clearLogs){
+            log.setRegistered(avgR-log.getRegistered());
+            sqrDeviationR+= Math.pow(log.getRegistered(),2);
+            log.setAccepted(avgA-log.getAccepted());
+            sqrDeviationA+=Math.pow(log.getAccepted(),2);
+            fullDeviationAR+=log.getRegistered()*log.getAccepted();
+        }
+        if ((fullDeviationAR==0)||(sqrDeviationA==0)||(sqrDeviationR==0)){
+            return result;
+        }
+        double korrelation = fullDeviationAR/(Math.sqrt(sqrDeviationA*sqrDeviationR));
+        if (Math.abs(korrelation)>=0.5){
+            clearLogs=getClearLogs(category_id);
+            double avg=0;
+            for (OrderLog log:clearLogs){
+                avg+=log.getAccepted()-log.getRegistered();
+            }
+            return (long)avg/clearLogs.size();
+        }
+        return result;
